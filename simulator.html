@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DKV Career & Sustainability Simulator</title>
+    <!-- Tailwind CSS CDN untuk UI Modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animasi halus untuk transisi halaman */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
+
+    <!-- TOP BAR: INDIKATOR METRIK REAL-TIME (Dual-Score Balance) -->
+    <div id="metric-bar" class="hidden sticky top-0 bg-white/95 backdrop-blur shadow-md z-40 border-b border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-indigo-600 text-sm md:text-base">Kreatif Nusantara</span>
+                <span id="player-role-tag" class="bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded-full font-medium"></span>
+            </div>
+            
+            <!-- Skor-skor -->
+            <div class="flex items-center gap-6">
+                <!-- Estetika Desain -->
+                <div class="flex flex-col items-end">
+                    <span class="text-xs text-slate-500 font-semibold">Estetika Desain</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-20 bg-slate-200 rounded-full h-2">
+                            <div id="score-design" class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 50%;"></div>
+                        </div>
+                        <span id="score-design-val" class="text-xs font-bold w-6 text-right">50</span>
+                    </div>
+                </div>
+
+                <!-- Kepuasan Klien -->
+                <div class="flex flex-col items-end">
+                    <span class="text-xs text-slate-500 font-semibold">Kepuasan Klien</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-20 bg-slate-200 rounded-full h-2">
+                            <div id="score-client" class="bg-amber-500 h-2 rounded-full transition-all duration-500" style="width: 50%;"></div>
+                        </div>
+                        <span id="score-client-val" class="text-xs font-bold w-6 text-right">50</span>
+                    </div>
+                </div>
+
+                <!-- Dampak Ekologis -->
+                <div class="flex flex-col items-end">
+                    <span class="text-xs text-slate-500 font-semibold">Dampak Ekologis</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-20 bg-slate-200 rounded-full h-2">
+                            <div id="score-eco" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 50%;"></div>
+                        </div>
+                        <span id="score-eco-val" class="text-xs font-bold w-6 text-right">50</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-3xl mx-auto px-4 py-8">
+        
+        <!-- ================= TAHAP 0: LOGIN & ONBOARDING ================= -->
+        <section id="stage-login" class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 fade-in text-center">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">DKV Career & Sustainability Simulator</h1>
+            <p class="text-slate-500 mb-8 max-w-md mx-auto">Masuki peran desainer kreatif di agensi virtual, belajar menerapkan <span class="underline decoration-dotted cursor-help text-indigo-600 font-medium" onclick="openGlossary('design-thinking')">Design Thinking</span>, dan uji pilihan produksimu terhadap lingkungan.</p>
+            
+            <div class="max-w-sm mx-auto text-left">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Magang Anda</label>
+                <input type="text" id="input-name" placeholder="Masukkan nama Anda..." class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-6">
+                <button onclick="startApp()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-lg shadow-indigo-600/20">
+                    Mulai Magang Virtual
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= TAHAP 1: PILIH JALUR KARIER ================= -->
+        <section id="stage-career" class="hidden bg-white p-8 rounded-2xl shadow-xl border border-slate-100 fade-in">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Pilih Fokus Kariermu</h2>
+            <p class="text-slate-500 mb-6">Sebagai Desainer Magang baru di <span class="font-semibold text-slate-700">Kreatif Nusantara</span>, jalur spesialisasi apa yang ingin kamu coba pertama kali?</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Graphic Designer -->
+                <button onclick="selectCareer('Graphic Designer')" class="text-left p-5 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50/20 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform font-bold">GD</div>
+                        <h3 class="font-bold text-slate-900 mb-1">Graphic Designer</h3>
+                        <p class="text-xs text-slate-500">Berfokus pada penciptaan identitas visual, grafis media, dan penyampaian pesan kreatif.</p>
+                    </div>
+                    <span class="text-xs font-bold text-indigo-600 mt-4 inline-flex items-center">Pilih Jalur &rarr;</span>
+                </button>
+
+                <!-- Packaging Designer -->
+                <button onclick="selectCareer('Packaging Designer')" class="text-left p-5 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50/20 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform font-bold">PD</div>
+                        <h3 class="font-bold text-slate-900 mb-1">Packaging Designer</h3>
+                        <p class="text-xs text-slate-500">Merancang bentuk, ergonomi, perlindungan fisik, serta keindahan visual kemasan produk.</p>
+                    </div>
+                    <span class="text-xs font-bold text-indigo-600 mt-4 inline-flex items-center">Pilih Jalur &rarr;</span>
+                </button>
+
+                <!-- Print Production Specialist -->
+                <button onclick="selectCareer('Print Production Specialist')" class="text-left p-5 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50/20 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform font-bold">PS</div>
+                        <h3 class="font-bold text-slate-900 mb-1">Print Production</h3>
+                        <p class="text-xs text-slate-500">Menguasai teknologi cetak, persiapan berkas pracetak, dan penanganan sisa produksi/limbah.</p>
+                    </div>
+                    <span class="text-xs font-bold text-indigo-600 mt-4 inline-flex items-center">Pilih Jalur &rarr;</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= TAHAP 2A: DESIGN THINKING (EMPATHIZE & DEFINE) ================= -->
+        <section id="stage-chat" class="hidden bg-white p-6 rounded-2xl shadow-xl border border-slate-100 fade-in flex flex-col h-[550px]">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">S</div>
+                <div>
+                    <h3 class="font-bold text-slate-900">Ibu Sari (UMKM Keripik Singkong Barokah)</h3>
+                    <p class="text-xs text-emerald-600 flex items-center gap-1 font-medium">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online • Klien Pertama Anda
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 scrollbar-thin">
+                <!-- Pesan pembuka -->
+                <div class="flex items-start gap-2 max-w-[85%]">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold shrink-0">S</div>
+                    <div class="bg-slate-100 p-3 rounded-2xl rounded-tl-none text-sm">
+                        Halo, selamat siang desainer. Saya Sari, pemilik usaha Keripik Singkong Barokah. Kami ingin memperbarui kemasan produk kami yang masih menggunakan plastik bening biasa dan sablon manual satu warna. Kami ingin bisa masuk ke swalayan modern, tapi bingung harus mulai dari mana.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dialogue Options -->
+            <div class="border-t border-slate-100 pt-4">
+                <p class="text-xs text-slate-400 mb-2 font-semibold uppercase">Pilih Respon Komunikasi Anda (Empatimu Diuji):</p>
+                <div id="chat-options" class="grid grid-cols-1 gap-2">
+                    <!-- Pilihan akan dimuat dinamis lewat JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAHAP 2B: DESIGN THINKING (IDEATE & PROTOTYPE) ================= -->
+        <section id="stage-design" class="hidden bg-white p-8 rounded-2xl shadow-xl border border-slate-100 fade-in">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Ideation & Prototyping</h2>
+            <p class="text-slate-500 mb-6">Berdasarkan hasil wawancara, mari rancang konsep visual kemasan terbaik. Gunakan pemahamanmu terhadap <span class="underline decoration-dotted cursor-help text-indigo-600" onclick="openGlossary('unsur-desain')">unsur</span> dan <span class="underline decoration-dotted cursor-help text-indigo-600" onclick="openGlossary('prinsip-desain')">prinsip desain</span>.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Panel Pilihan Desain -->
+                <div class="space-y-6">
+                    <!-- Palet Warna -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">1. Skema Warna Utama</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setDesignChoice('color', 'earthy')" id="btn-color-earthy" class="p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200">
+                                <span class="block font-bold text-sm">Warna Bumi (Earthy)</span>
+                                <span class="text-xs text-slate-500">Cokelat kayu & hijau daun (Kesan natural/organik).</span>
+                            </button>
+                            <button onclick="setDesignChoice('color', 'neon')" id="btn-color-neon" class="p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200">
+                                <span class="block font-bold text-sm">Neon Menyala</span>
+                                <span class="text-xs text-slate-500 font-medium">Pink & biru elektrik (Kesan modern futuristik).</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tipografi -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">2. Tipografi (Jenis Huruf)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setDesignChoice('font', 'sans')" id="btn-font-sans" class="p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200">
+                                <span class="block font-bold text-sm font-sans">Sans-Serif Bersih</span>
+                                <span class="text-xs text-slate-500">Mudah dibaca di rak modern, rapi & minimalis.</span>
+                            </button>
+                            <button onclick="setDesignChoice('font', 'hand')" id="btn-font-hand" class="p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200">
+                                <span class="block font-bold text-sm font-serif">Handwritten Kasual</span>
+                                <span class="text-xs text-slate-500">Kesan rumahan, tradisional, namun bisa sulit terbaca jika terlalu kecil.</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tata Letak -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">3. Tata Letak (Prinsip Layout)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setDesignChoice('layout', 'asym')" id="btn-layout-asym" class="p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200">
+                                <span class="block font-bold text-sm"><span class="underline decoration-dotted cursor-help text-indigo-600" onclick="openGlossary('asimetris')">Keseimbangan Asimetris</span></span>
+                                <span class="text-xs text-slate-500">Dinamis, menaruh elemen visual secara estetik tidak kaku.</span>
+                            </button>
+                            <button onclick="setDesignChoice('layout', 'sym')" id="btn-layout-sym" class="p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200">
+                                <span class="block font-bold text-sm">Keseimbangan Simetris</span>
+                                <span class="text-xs text-slate-500">Klasik, aman, namun terkadang dinilai terlalu kaku atau kuno.</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Pratinjau Interaktif (Mockup Sederhana) -->
+                <div class="bg-slate-100 rounded-2xl p-6 flex flex-col items-center justify-center border border-dashed border-slate-300 min-h-[300px]">
+                    <span class="text-xs font-bold text-slate-400 mb-4 uppercase">Pratinjau Kemasan Virtual</span>
+                    
+                    <!-- Prototipe Kemasan Dinamis -->
+                    <div id="mockup-bg" class="w-48 h-64 bg-slate-200 rounded-xl shadow-lg border border-slate-300 flex flex-col justify-between p-4 transition-all duration-500">
+                        <!-- Top Header -->
+                        <div class="flex justify-between items-start">
+                            <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-white/70 font-semibold">Netto: 150g</span>
+                            <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+                        </div>
+
+                        <!-- Brand Name & Description -->
+                        <div class="text-center my-auto">
+                            <h4 id="mockup-title" class="text-lg font-bold text-slate-800 transition-all font-sans">BAROKAH</h4>
+                            <p id="mockup-desc" class="text-[9px] text-slate-600 mt-1">Keripik Singkong Renyah Nusantara</p>
+                        </div>
+
+                        <!-- Bottom Footer -->
+                        <div class="border-t border-slate-400/20 pt-2 flex justify-between items-center text-[8px] text-slate-500">
+                            <span>Sari Barokah Ltd.</span>
+                            <span>★★★</span>
+                        </div>
+                    </div>
+
+                    <button id="btn-submit-design" onclick="submitDesign()" class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors w-full text-sm">
+                        Kirim Konsep Desain ke Klien
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAHAP 3: KEPUTUSAN PRODUKSI & EKOLOGI ================= -->
+        <section id="stage-production" class="hidden bg-white p-8 rounded-2xl shadow-xl border border-slate-100 fade-in">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Dilema Produksi & Keberlanjutan</h2>
+            <p class="text-slate-500 mb-6">Desain Anda berhasil disetujui Ibu Sari! Sekarang saatnya memilih metode produksi massal (<span class="underline decoration-dotted cursor-help text-indigo-600" onclick="openGlossary('grafika')">Grafika</span>). Ibu Sari berkata: <span class="italic">"Tolong buat kemasan plastik biasa yang murah agar biaya produksi kita kecil dan untung cepat."</span></p>
+            
+            <p class="text-xs text-red-500 font-bold mb-4 uppercase">Pikirkan Konsep Hijau (Green Design) sebelum memilih:</p>
+            
+            <div class="space-y-4">
+                <!-- Pilihan 1 -->
+                <div class="p-5 border border-slate-200 rounded-xl hover:border-red-300 hover:bg-red-50/10 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-slate-900">Pilihan A: Ikuti Permintaan Plastik Biasa</h4>
+                            <span class="text-xs text-red-600 font-semibold bg-red-100 px-2 py-0.5 rounded">Prioritas Profit</span>
+                        </div>
+                        <p class="text-sm text-slate-600">Menggunakan plastik PP non-degradable dan dicetak secara konvensional murah. Mengurangi modal awal UMKM namun membebani lingkungan.</p>
+                        <div class="mt-3 text-xs flex gap-4 text-slate-500 font-medium">
+                            <span>Skor Klien: <strong class="text-emerald-600">+20</strong></span>
+                            <span>Dampak Ekologis: <strong class="text-red-600">-50</strong> (Sangat Merusak)</span>
+                        </div>
+                    </div>
+                    <button onclick="selectProduction(1)" class="mt-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded transition-colors self-end">
+                        Pilih Opsi Ini
+                    </button>
+                </div>
+
+                <!-- Pilihan 2 -->
+                <div class="p-5 border border-slate-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50/10 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-slate-900">Pilihan B: Usulkan Kertas Daur Ulang & <span class="underline decoration-dotted cursor-help text-indigo-600" onclick="openGlossary('soy-ink')">Tinta Kedelai</span></h4>
+                            <span class="text-xs text-emerald-600 font-semibold bg-emerald-100 px-2 py-0.5 rounded">Prioritas Ekologi</span>
+                        </div>
+                        <p class="text-sm text-slate-600">Menolak plastik, mengusulkan kemasan berbasis kertas cokelat daur ulang yang bisa dikomposkan, menggunakan tinta organik berbasis minyak kedelai.</p>
+                        <div class="mt-3 text-xs flex gap-4 text-slate-500 font-medium">
+                            <span>Skor Klien: <strong class="text-red-600">-10</strong> (Biaya Naik)</span>
+                            <span>Dampak Ekologis: <strong class="text-emerald-600">+40</strong> (Sangat Bersih)</span>
+                        </div>
+                    </div>
+                    <button onclick="selectProduction(2)" class="mt-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded transition-colors self-end">
+                        Pilih Opsi Ini
+                    </button>
+                </div>
+
+                <!-- Pilihan 3 -->
+                <div class="p-5 border border-slate-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/10 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-slate-900">Pilihan C: Edukasi Eco-Branding & <span class="underline decoration-dotted cursor-help text-indigo-600" onclick="openGlossary('smart-layouting')">Smart Layouting</span></h4>
+                            <span class="text-xs text-indigo-600 font-semibold bg-indigo-100 px-2 py-0.5 rounded">Solusi Desainer Profesional</span>
+                        </div>
+                        <p class="text-sm text-slate-600">Edukasi Ibu Sari bahwa "Hijau" bisa dijual mahal (Premium). Gunakan kemasan bioplastik (mudah urai) dan atur tata letak pelat cetak agar meminimalkan sisa potongan bahan kertas yang terbuang percuma.</p>
+                        <div class="mt-3 text-xs flex gap-4 text-slate-500 font-medium">
+                            <span>Skor Klien: <strong class="text-emerald-600">+30</strong> (Pasar Baru)</span>
+                            <span>Dampak Ekologis: <strong class="text-emerald-600">+30</strong> (Efisien)</span>
+                        </div>
+                    </div>
+                    <button onclick="selectProduction(3)" class="mt-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2 px-4 rounded transition-colors self-end">
+                        Pilih Opsi Ini
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAHAP 4: RAPOR DIGITAL & REFLEKSI VISUAL ================= -->
+        <section id="stage-report" class="hidden bg-white p-8 rounded-2xl shadow-xl border border-slate-100 fade-in text-center">
+            <span class="text-xs font-bold bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full uppercase">Evaluasi Magang Akhir</span>
+            <h2 class="text-3xl font-extrabold text-slate-900 mt-3 mb-2">Rapor Hasil Solusi Desain</h2>
+            <p class="text-slate-500 mb-8">Kerja keras Anda di <span class="font-semibold">Kreatif Nusantara</span> selesai. Berikut laporan analisis dampak sosial dan ekologis karya Anda:</p>
+            
+            <!-- Ilustrasi Visual Dampak Keputusan -->
+            <div class="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center justify-center">
+                <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider mb-2">Visualisasi Dampak</h3>
+                <div id="impact-visual" class="text-center">
+                    <!-- Dimuat dinamis berdasarkan keputusan -->
+                </div>
+            </div>
+
+            <!-- Kartu Skor Final -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
+                    <span class="text-xs font-semibold text-blue-600 block uppercase mb-1">Estetika Desain</span>
+                    <span id="final-design-score" class="text-3xl font-black text-blue-700">50</span>
+                    <p class="text-[10px] text-slate-500 mt-2">Menunjukkan penguasaan prinsip rupa & tipografi.</p>
+                </div>
+                <div class="p-4 bg-amber-50/50 border border-amber-100 rounded-xl">
+                    <span class="text-xs font-semibold text-amber-600 block uppercase mb-1">Kepuasan Klien</span>
+                    <span id="final-client-score" class="text-3xl font-black text-amber-700">50</span>
+                    <p class="text-[10px] text-slate-500 mt-2">Ditinjau dari komunikasi empati dan profit komersial.</p>
+                </div>
+                <div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl">
+                    <span class="text-xs font-semibold text-emerald-600 block uppercase mb-1">Eco-Impact</span>
+                    <span id="final-eco-score" class="text-3xl font-black text-emerald-700">50</span>
+                    <p class="text-[10px] text-slate-500 mt-2">Mengukur kesadaran pelestarian lingkungan hidup.</p>
+                </div>
+            </div>
+
+            <div id="eval-critique" class="text-left bg-slate-900 text-slate-100 p-6 rounded-xl mb-8 space-y-2 text-sm leading-relaxed">
+                <!-- Catatan evaluasi guru dimuat otomatis -->
+            </div>
+
+            <button onclick="restartApp()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors w-full md:w-auto">
+                Coba Simulasi Lagi (Karier/Pilihan Lain)
+            </button>
+        </section>
+
+    </main>
+
+    <!-- ================= GLOSARIUM TEORI POP-UP MODAL ================= -->
+    <div id="glossary-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 relative fade-in">
+            <button onclick="closeGlossary()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Glisarium Teori</span>
+            <h3 id="glossary-title" class="text-lg font-bold text-slate-900 mt-2 mb-1">Nama Istilah</h3>
+            <p id="glossary-desc" class="text-sm text-slate-600 leading-relaxed">Penjelasan istilah akademik.</p>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT: ENGINE SIMULASI ================= -->
+    <script>
+        // Data internal glosarium teori belajar
+        const glossaryData = {
+            'design-thinking': {
+                title: 'Design Thinking',
+                desc: 'Metode penyelesaian masalah secara kreatif yang berfokus pada kebutuhan manusia (user-centered). Tahapannya terdiri dari Empati, Definisikan Masalah, Ideasi, Membuat Prototipe, dan Pengujian.'
+            },
+            'unsur-desain': {
+                title: 'Unsur Desain',
+                desc: 'Komponen visual dasar yang membangun suatu karya rupa, meliputi garis, bidang, bentuk, warna, tekstur, ruang, gelap-terang, dan ukuran.'
+            },
+            'prinsip-desain': {
+                title: 'Prinsip Desain',
+                desc: 'Aturan/metode untuk menata unsur desain agar terlihat harmonis dan efektif. Meliputi keseimbangan, kontras, ritme/irama, proporsi, dominasi (vocal point), dan keselarasan.'
+            },
+            'grafika': {
+                title: 'Teknologi Grafika',
+                desc: 'Segala hal yang berkaitan dengan proses reproduksi tulisan, gambar, atau desain secara massal menggunakan teknologi cetak (cetak tinggi, cetak dalam, cetak datar/offset, sablon, maupun cetak digital).'
+            },
+            'asimetris': {
+                title: 'Keseimbangan Asimetris',
+                desc: 'Metode penataan visual di mana sisi kiri dan kanan tidak sama persis, namun memiliki bobot visual yang tetap terasa seimbang berkat permainan kontras warna, ukuran, atau letak elemen.'
+            },
+            'soy-ink': {
+                title: 'Tinta Berbasis Kedelai (Soy-Ink)',
+                desc: 'Tinta ramah lingkungan yang diproduksi dari minyak kedelai. Memiliki keunggulan tidak mengeluarkan emisi gas beracun (VOC) saat dicetak dan mempermudah proses pemisahan tinta saat kertas didaur ulang.'
+            },
+            'smart-layouting': {
+                title: 'Smart Layouting',
+                desc: 'Teknik penataan bidang cetakan pada lembar kertas kerja utama sebelum dicetak secara massal, agar meminimalkan bagian kertas kosong tak terpakai yang akhirnya dibuang menjadi sampah.'
+            }
+        };
+
+        // Alur Percabangan Dialog Wawancara Chatbot (Materi A & C)
+        const chatFlow = [
+            {
+                step: 0,
+                speaker: 'Ibu Sari',
+                text: 'Selamat datang! Terima kasih sudah bersedia membantu "Keripik Singkong Barokah". Kami ingin sekali produk kami terlihat eksklusif untuk dipasarkan di swalayan modern. Menurut Anda, apa masalah kemasan lama kami?',
+                options: [
+                    {
+                        text: '"Kemasan Ibu sangat kuno, jelek, dan murahan. Wajar jika swalayan tidak mau menerima."',
+                        scores: { client: -15, design: +5 },
+                        nextText: 'Waduh... kata-kata Anda cukup tajam ya. Kami hanya pengusaha kecil yang tidak mengerti desain...',
+                        nextStep: 1
+                    },
+                    {
+                        text: '"Bisa tolong ceritakan, apa bahan kemasan yang dipakai saat ini dan mengapa memilih desain sablon tersebut?"',
+                        scores: { client: +15, design: +5 },
+                        nextText: 'Kami pakai plastik bening PP tebal jepit biasa. Sablon manual satu warna hijau karena itu warna kesukaan bapak saya. Gambarnya pun sekadar nama usaha kami saja.',
+                        nextStep: 1
+                    },
+                    {
+                        text: '"Tidak usah banyak tanya Bu, saya langsung buatkan saja logo yang keren dan mewah untuk Ibu."',
+                        scores: { client: -5, design: -10 },
+                        nextText: 'Oh... baiklah, tapi saya harap Anda mendengarkan dulu apa yang kami butuhkan.',
+                        nextStep: 1
+                    }
+                ]
+            },
+            {
+                step: 1,
+                speaker: 'Ibu Sari',
+                text: 'Sebenarnya, siapa target pembeli yang ingin Anda sasar dengan kemasan baru ini nantinya?',
+                options: [
+                    {
+                        text: '"Bagaimana jika kita sasar kelompok anak muda & keluarga modern yang mencari camilan organik alami?"',
+                        scores: { client: +15, design: +15 },
+                        nextText: 'Ide bagus! Keripik kami dibuat tanpa pengawet dan diolah dari singkong pilihan petani lokal langsung. Ini nilai jual kami.',
+                        nextStep: 2
+                    },
+                    {
+                        text: '"Semua orang saja Bu, dari bayi sampai lansia biar penjualannya maksimal!"',
+                        scores: { client: -5, design: -5 },
+                        nextText: 'Hmm, jika terlalu luas, saya khawatir kita tidak punya ciri khas dibanding keripik singkong lainnya yang jumlahnya ribuan di pasar.',
+                        nextStep: 2
+                    }
+                ]
+            },
+            {
+                step: 2,
+                speaker: 'Ibu Sari',
+                text: 'Baik, saya rasa Anda sudah mulai memahami kebutuhan produk kami. Sekarang, tolong rancang visual prototipenya. Warna dan huruf apa yang cocok?',
+                options: [
+                    {
+                        text: '"Mari kita lanjutkan ke proses desain visual!"',
+                        scores: { client: +10, design: +10 },
+                        action: 'goToDesignStage'
+                    }
+                ]
+            }
+        ];
+
+        // State Simulator
+        let state = {
+            playerName: '',
+            career: '',
+            scores: { design: 50, client: 50, eco: 50 },
+            currentChatStep: 0,
+            designChoices: { color: '', font: '', layout: '' },
+            productionChoice: 0
+        };
+
+        // Fungsi Memulai Aplikasi (Login)
+        function startApp() {
+            const nameInput = document.getElementById('input-name').value.trim();
+            if (!nameInput) {
+                alert('Silakan masukkan nama magang Anda terlebih dahulu!');
+                return;
+            }
+            state.playerName = nameInput;
+            document.getElementById('stage-login').classList.add('hidden');
+            document.getElementById('stage-career').classList.remove('hidden');
+        }
+
+        // Jalur Pilihan Karier (Materi A)
+        function selectCareer(role) {
+            state.career = role;
+            
+            // Set tag peran di top bar
+            document.getElementById('player-role-tag').innerText = role;
+            document.getElementById('metric-bar').classList.remove('hidden');
+            
+            // Lanjut ke Chat Stage
+            document.getElementById('stage-career').classList.add('hidden');
+            document.getElementById('stage-chat').classList.remove('hidden');
+            
+            // Muat percakapan pertama
+            loadChatStep(0);
+        }
+
+        // Sistem Komunikasi Chatbot Percabangan Cerita (Materi C)
+        function loadChatStep(stepIdx) {
+            const stepData = chatFlow[stepIdx];
+            if (!stepData) return;
+
+            const optionsContainer = document.getElementById('chat-options');
+            optionsContainer.innerHTML = '';
+
+            stepData.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3 border border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-slate-50 text-xs transition-all";
+                btn.innerText = opt.text;
+                btn.onclick = () => selectDialogueOption(opt, stepData.speaker);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectDialogueOption(option, speakerName) {
+            const chatMessages = document.getElementById('chat-messages');
+
+            // 1. Tampilkan pesan pilihan user
+            const userMsg = document.createElement('div');
+            userMsg.className = "flex items-start gap-2 max-w-[85%] self-end flex-row-reverse ml-auto";
+            userMsg.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold shrink-0">Me</div>
+                <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none text-sm">${option.text}</div>
+            `;
+            chatMessages.appendChild(userMsg);
+
+            // Update skor sementara
+            if (option.scores) {
+                updateScores(option.scores.design || 0, option.scores.client || 0, option.scores.eco || 0);
+            }
+
+            // Scroll ke bawah
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Nonaktifkan opsi obrolan sementara menunggu respon
+            document.getElementById('chat-options').innerHTML = '<span class="text-xs text-slate-400 italic">Ibu Sari sedang mengetik...</span>';
+
+            // 2. Tampilkan respon balik klien setelah jeda singkat
+            setTimeout(() => {
+                const clientMsg = document.createElement('div');
+                clientMsg.className = "flex items-start gap-2 max-w-[85%] fade-in";
+                clientMsg.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold shrink-0">S</div>
+                    <div class="bg-slate-100 p-3 rounded-2xl rounded-tl-none text-sm">${option.nextText}</div>
+                `;
+                chatMessages.appendChild(clientMsg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Cek aksi khusus menuju tahap desain atau lanjut chat
+                if (option.action === 'goToDesignStage') {
+                    setTimeout(() => {
+                        document.getElementById('stage-chat').classList.add('hidden');
+                        document.getElementById('stage-design').classList.remove('hidden');
+                    }, 1000);
+                } else {
+                    loadChatStep(option.nextStep);
+                }
+            }, 1000);
+        }
+
+        // Pengaturan Pilihan Konsep Desain Prototyping (Materi C)
+        function setDesignChoice(category, choice) {
+            state.designChoices[category] = choice;
+
+            // Reset semua border tombol di kategori ini
+            const btns = document.querySelectorAll(`[id^="btn-${category}-"]`);
+            btns.forEach(b => b.className = "p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200");
+
+            // Sorot tombol terpilih
+            const activeBtn = document.getElementById(`btn-${category}-${choice}`);
+            activeBtn.className = "p-3 border-2 rounded-xl text-left bg-indigo-50/50 border-indigo-500 font-medium";
+
+            // Update Mockup Visual Dinamis
+            updateMockup();
+        }
+
+        function updateMockup() {
+            const mockupBg = document.getElementById('mockup-bg');
+            const mockupTitle = document.getElementById('mockup-title');
+
+            // Perubahan Warna
+            if (state.designChoices.color === 'earthy') {
+                mockupBg.className = "w-48 h-64 bg-amber-100 rounded-xl shadow-lg border border-amber-300 flex flex-col justify-between p-4 transition-all duration-500";
+            } else if (state.designChoices.color === 'neon') {
+                mockupBg.className = "w-48 h-64 bg-pink-500 rounded-xl shadow-lg border border-pink-600 flex flex-col justify-between p-4 transition-all duration-500 text-white";
+            }
+
+            // Perubahan Tipografi
+            if (state.designChoices.font === 'sans') {
+                mockupTitle.className = "text-lg font-black tracking-wider text-slate-800 font-sans transition-all";
+            } else if (state.designChoices.font === 'hand') {
+                mockupTitle.className = "text-xl font-bold italic tracking-wide text-amber-900 font-serif transition-all";
+            }
+
+            // Perubahan Layout Asimetris vs Simetris
+            if (state.designChoices.layout === 'asym') {
+                mockupTitle.style.textAlign = 'left';
+                mockupTitle.style.transform = 'rotate(-3deg)';
+            } else if (state.designChoices.layout === 'sym') {
+                mockupTitle.style.textAlign = 'center';
+                mockupTitle.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Pengiriman Desain & Evaluasi Kecocokan (Materi C)
+        function submitDesign() {
+            const { color, font, layout } = state.designChoices;
+
+            if (!color || !font || !layout) {
+                alert('Tolong lengkapi semua pilihan elemen desain terlebih dahulu!');
+                return;
+            }
+
+            // Logika evaluasi (Target produk organik alami paling cocok dengan warna bumi dan sans-serif modern)
+            let designScoreBonus = 0;
+            let clientScoreBonus = 0;
+
+            if (color === 'earthy') {
+                designScoreBonus += 15;
+                clientScoreBonus += 15;
+            } else {
+                designScoreBonus -= 10; // Neon tidak cocok untuk produk singkong organik tradisional
+                clientScoreBonus -= 5;
+            }
+
+            if (font === 'sans') {
+                designScoreBonus += 10;
+                clientScoreBonus += 10;
+            } else {
+                designScoreBonus += 5; // Handwritten lumayan bagus tapi kurang modern
+            }
+
+            if (layout === 'asym') {
+                designScoreBonus += 15; // Asimetris dinilai sangat kekinian oleh dewan juri agensi
+            } else {
+                designScoreBonus += 5;
+            }
+
+            updateScores(designScoreBonus, clientScoreBonus, 0);
+
+            // Pindah ke Tahap Produksi
+            document.getElementById('stage-design').classList.add('hidden');
+            document.getElementById('stage-production').classList.remove('hidden');
+        }
+
+        // Pengambilan Keputusan Produksi Ramah Lingkungan (Materi B)
+        function selectProduction(choice) {
+            state.productionChoice = choice;
+
+            if (choice === 1) {
+                updateScores(0, +20, -50);
+            } else if (choice === 2) {
+                updateScores(+10, -10, +40);
+            } else if (choice === 3) {
+                updateScores(+15, +30, +30);
+            }
+
+            // Menuju Tahap Akhir (Rapor)
+            document.getElementById('stage-production').classList.add('hidden');
+            document.getElementById('stage-report').classList.remove('hidden');
+
+            renderReport();
+        }
+
+        // Penyusunan Rapor Hasil Belajar Siswa (Materi A, B, C)
+        function renderReport() {
+            // Tampilkan Skor Akhir
+            document.getElementById('final-design-score').innerText = state.scores.design;
+            document.getElementById('final-client-score').innerText = state.scores.client;
+            document.getElementById('final-eco-score').innerText = state.scores.eco;
+
+            const visualContainer = document.getElementById('impact-visual');
+            const critiqueBox = document.getElementById('eval-critique');
+
+            let visualText = '';
+            let critiqueText = '';
+
+            // Evaluasi visual dan catatan berdasarkan keputusan produksi
+            if (state.productionChoice === 1) {
+                visualText = `
+                    <div class="text-6xl mb-4">🍂⚠️🗑️</div>
+                    <p class="text-red-600 font-bold text-sm">Kemasan Plastik Barokah Menumpuk di Sungai!</p>
+                    <p class="text-xs text-slate-500 mt-2">Keputusan memilih bahan murah PP non-degradable mendatangkan laba jangka pendek, namun kemasan bermerek "Barokah" yang Anda rancang kini menjadi limbah abadi yang mencemari saluran air kota.</p>
+                `;
+                critiqueText += `<p><strong>Catatan Instruktur DKV:</strong> Meskipun profit klien meningkat, pilihan kemasan Anda mencederai komitmen <em>Green Design</em>. Di era modern, reputasi brand bisa hancur jika dikaitkan dengan perusakan alam secara masif.</p>`;
+            } else if (state.productionChoice === 2) {
+                visualText = `
+                    <div class="text-6xl mb-4">🌱📦📄</div>
+                    <p class="text-emerald-600 font-bold text-sm">Kemasan Ramah Lingkungan Berhasil Dikomposkan!</p>
+                    <p class="text-xs text-slate-500 mt-2">Kertas cokelat daur ulang dan tinta minyak kedelai Anda mendapat apresiasi besar dari komunitas pencinta alam. Meskipun laba bersih tipis karena biaya bahan naik, brand Anda memiliki citra sangat bersih.</p>
+                `;
+                critiqueText += `<p><strong>Catatan Instruktur DKV:</strong> Pilihan yang mulia bagi lingkungan! Namun, ingat bahwa sebagai perancang industri grafika, Anda juga harus melatih komunikasi bisnis agar klien tidak merasa terlalu dibebani biaya produksi tinggi.</p>`;
+            } else if (state.productionChoice === 3) {
+                visualText = `
+                    <div class="text-6xl mb-4">🌟♻️📈</div>
+                    <p class="text-indigo-600 font-bold text-sm">Solusi Cerdas: Desain Efisien & Edukasi Pasar!</p>
+                    <p class="text-xs text-slate-500 mt-2">Dengan menggunakan bioplastik dan menata layout pelat secara cerdas (<em>Smart Layouting</em>), sisa potongan kertas cetak ditekan hingga 5%. Ibu Sari mendapat untung besar berkat citra <em>Eco-Branding</em> premium yang Anda buat!</p>
+                `;
+                critiqueText += `<p><strong>Catatan Instruktur DKV:</strong> Luar biasa! Anda bertindak sebagai konsultan desain profesional. Anda membuktikan bahwa pemahaman mendalam tentang teknologi grafika, tata letak, dan proses <em>Design Thinking</em> bisa menciptakan solusi yang menguntungkan ekonomi sekaligus melestarikan bumi.</p>`;
+            }
+
+            // Tambahan ulasan estetika rupa
+            if (state.scores.design >= 75) {
+                critiqueText += `<p class="mt-2 text-indigo-400">★ Penguasaan Unsur Rupa Anda sangat matang. Pilihan skema warna bumi dan tata letak yang dinamis sangat cocok dengan kepribadian produk organik alami.</p>`;
+            } else {
+                critiqueText += `<p class="mt-2 text-red-400">⚠ Perlu Latihan Rupa: Kombinasi warna yang Anda pilih dinilai kurang harmonis dengan identitas produk singkong organik tradisional. Pelajari kembali psikologi warna.</p>`;
+            }
+
+            visualContainer.innerHTML = visualText;
+            critiqueBox.innerHTML = critiqueText;
+        }
+
+        // Pembaruan Nilai Metrik (Real-Time Metrics Engine)
+        function updateScores(design, client, eco) {
+            state.scores.design = Math.max(0, Math.min(100, state.scores.design + design));
+            state.scores.client = Math.max(0, Math.min(100, state.scores.client + client));
+            state.scores.eco = Math.max(0, Math.min(100, state.scores.eco + eco));
+
+            // Perbarui UI bar
+            document.getElementById('score-design').style.width = state.scores.design + '%';
+            document.getElementById('score-design-val').innerText = state.scores.design;
+
+            document.getElementById('score-client').style.width = state.scores.client + '%';
+            document.getElementById('score-client-val').innerText = state.scores.client;
+
+            document.getElementById('score-eco').style.width = state.scores.eco + '%';
+            document.getElementById('score-eco-val').innerText = state.scores.eco;
+        }
+
+        // Pengendali Glosarium Teori Pop-Up
+        function openGlossary(termKey) {
+            const term = glossaryData[termKey];
+            if (!term) return;
+
+            document.getElementById('glossary-title').innerText = term.title;
+            document.getElementById('glossary-desc').innerText = term.desc;
+            document.getElementById('glossary-modal').classList.remove('hidden');
+        }
+
+        function closeGlossary() {
+            document.getElementById('glossary-modal').classList.add('hidden');
+        }
+
+        // Restart Aplikasi
+        function restartApp() {
+            state = {
+                playerName: '',
+                career: '',
+                scores: { design: 50, client: 50, eco: 50 },
+                currentChatStep: 0,
+                designChoices: { color: '', font: '', layout: '' },
+                productionChoice: 0
+            };
+
+            // Reset UI
+            document.getElementById('chat-messages').innerHTML = '';
+            document.getElementById('input-name').value = '';
+            document.getElementById('metric-bar').classList.add('hidden');
+            document.getElementById('stage-report').classList.add('hidden');
+            document.getElementById('stage-login').classList.remove('hidden');
+            
+            // Reset style tombol desain
+            const designBtns = document.querySelectorAll(`[id^="btn-"]`);
+            designBtns.forEach(b => b.className = "p-3 border rounded-xl text-left hover:bg-slate-50 border-slate-200");
+            updateMockup();
+        }
+    </script>
+</body>
+</html>
